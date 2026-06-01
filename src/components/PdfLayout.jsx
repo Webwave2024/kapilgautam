@@ -4,13 +4,13 @@ import logo from "../components/logo.png";
 
 const PdfLayout = forwardRef(({ formData }, ref) => {
     const financialYear = "2026-27";
-    
+
     // Get invoice counter from localStorage (persists across page refreshes)
     const getInvoiceCounter = () => {
         const counter = localStorage.getItem('invoiceCounter');
         return counter ? parseInt(counter, 10) : 0;
     };
-    
+
     const invoiceCounter = getInvoiceCounter();
     const invoiceNumber = `WBPL/${financialYear}/${invoiceCounter.toString().padStart(2, '0')}`;
     const items = formData?.items || [];
@@ -188,12 +188,12 @@ const PdfLayout = forwardRef(({ formData }, ref) => {
                 </div>
                 <div style={pdfStyles.bankBox}>
                     <h3 style={pdfStyles.bankBoxTitle}>Billed By:</h3>
-                    <p style={pdfStyles.detailItem}><strong>Account Name:</strong> Webwave Business Pvt Ltd</p>
-                    <p style={pdfStyles.detailItem}><strong>Account Number:</strong> 923020060598477</p>
-                    <p style={pdfStyles.detailItem}><strong>IFSC:</strong> UTIB0004098</p>
-                    <p style={pdfStyles.detailItem}><strong>Branch Name:</strong> Ajay Enclave</p>
+                    <p style={pdfStyles.detailItem}><strong>Account Name:</strong> WEBWAVE BUSINESS PRIVATE LIMITED</p>
+                    <p style={pdfStyles.detailItem}><strong>Account Number:</strong> 44576387700</p>
+                    <p style={pdfStyles.detailItem}><strong>IFSC:</strong> SBIN0021275</p>
+                    <p style={pdfStyles.detailItem}><strong>Branch Name:</strong> GANESH NAGAR</p>
                     <p style={pdfStyles.detailItem}>
-                        <strong>Address:</strong> Ground Floor, Property No. 26/1, Ajay Enclave, New Ajanta Cinema, New Delhi - 110026
+                        <strong>Address:</strong> B-1/32, GROUND FLOOR GANESH NAGAR JANAKPURI NEW DELHI 110058
                     </p>
                 </div>
                 <div style={pdfStyles.signatureContainer}>

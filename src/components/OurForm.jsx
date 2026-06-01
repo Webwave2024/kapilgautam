@@ -410,10 +410,10 @@ const OurFormComponent = () => {
                     <input
                         type="text"
                         name="pan"
-                        placeholder="PAN Number"
+                        placeholder="PAN Number (optional)"
                         value={formData.pan}
                         onChange={handleChange}
-                        required
+
                     />
 
                     <h3>Items</h3>
@@ -498,17 +498,17 @@ const OurFormComponent = () => {
                                 required
                             />
 
-<label>Amount:</label>
-<input
-    type="number"
-    name="amount"
-    placeholder="amount"
-    value={item.amount}
-    onChange={(e) => handleItemChange(index, e)}
-    min="0"
-    step="0.01"
-    required
-/>
+                            <label>Amount:</label>
+                            <input
+                                type="number"
+                                name="amount"
+                                placeholder="amount"
+                                value={item.amount}
+                                onChange={(e) => handleItemChange(index, e)}
+                                min="0"
+                                step="0.01"
+                                required
+                            />
 
                             {formData.items.length > 1 && (
                                 <button
