@@ -1,6 +1,17 @@
-﻿import React, { forwardRef, useImperativeHandle } from "react";
+import React, { forwardRef, useImperativeHandle } from "react";
 import html2pdf from "html2pdf.js";
-import logo from "../components/logo.png";
+import logo from "./logo.png";
+
+const C = {
+    navy: "#1a1a4e",
+    gold: "#f0a500",
+    lightNavy: "#2d2d7a",
+    white: "#ffffff",
+    lightGray: "#f5f5f5",
+    borderGray: "#d0d0d0",
+    textDark: "#1a1a1a",
+    textMid: "#444444",
+};
 
 const PdfLayout = forwardRef(({ formData }, ref) => {
     const financialYear = "2026-27";
@@ -12,39 +23,25 @@ const PdfLayout = forwardRef(({ formData }, ref) => {
     };
 
     const invoiceCounter = getInvoiceCounter();
-    const invoiceNumber = `WBPL/${financialYear}/${invoiceCounter.toString().padStart(2, '0')}`;
+    const invoiceNumber = `KG/${financialYear}/${invoiceCounter.toString().padStart(3, '0')}`;
     const items = formData?.items || [];
 
-    const calculateItemTotals = (item) => {
-        const amount = parseFloat(item.amount) || 0;
-        const igstRate = 18;
-        const cgstRate = 0;
-        const sgstRate = 0;
+    const grandTotal = items.reduce((acc, item) => acc + (parseFloat(item.amount) || 0), 0);
 
-        const igstAmount = amount * (igstRate / 100);
-        const cgstAmount = amount * (cgstRate / 100);
-        const sgstAmount = amount * (sgstRate / 100);
-        const total = amount + igstAmount + cgstAmount + sgstAmount;
-
-        return {
-            amount,
-            igstAmount,
-            cgstAmount,
-            sgstAmount,
-            total,
-        };
+    const numberToWords = (num) => {
+        const ones = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
+            "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
+            "Seventeen", "Eighteen", "Nineteen"];
+        const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+        if (num === 0) return "Zero";
+        if (num < 20) return ones[num];
+        if (num < 100) return tens[Math.floor(num / 10)] + (num % 10 ? " " + ones[num % 10] : "");
+        if (num < 1000) return ones[Math.floor(num / 100)] + " Hundred" + (num % 100 ? " " + numberToWords(num % 100) : "");
+        if (num < 100000) return numberToWords(Math.floor(num / 1000)) + " Thousand" + (num % 1000 ? " " + numberToWords(num % 1000) : "");
+        if (num < 10000000) return numberToWords(Math.floor(num / 100000)) + " Lakh" + (num % 100000 ? " " + numberToWords(num % 100000) : "");
+        return numberToWords(Math.floor(num / 10000000)) + " Crore" + (num % 10000000 ? " " + numberToWords(num % 10000000) : "");
     };
-
-    const grandTotals = items.reduce((acc, item) => {
-        const itemTotals = calculateItemTotals(item);
-        return {
-            amount: acc.amount + itemTotals.amount,
-            igstAmount: acc.igstAmount + itemTotals.igstAmount,
-            cgstAmount: acc.cgstAmount + itemTotals.cgstAmount,
-            sgstAmount: acc.sgstAmount + itemTotals.sgstAmount,
-            total: acc.total + itemTotals.total,
-        };
-    }, { amount: 0, igstAmount: 0, cgstAmount: 0, sgstAmount: 0, total: 0 });
+    const amountInWords = numberToWords(Math.floor(grandTotal)) + " Rupees Only";
 
     const generatePDF = () => {
         try {
@@ -54,21 +51,15 @@ const PdfLayout = forwardRef(({ formData }, ref) => {
             }
 
             const options = {
-                margin: 10,
+                margin: [8, 8, 8, 8],
                 filename: `Invoice_${invoiceNumber}.pdf`,
                 image: { type: "jpeg", quality: 0.98 },
-                html2canvas: {
-                    scale: 2,
-                    logging: true,
-                    useCORS: true,
-                    backgroundColor: "#FFFFFF",
-                },
+                html2canvas: { scale: 2, useCORS: true, backgroundColor: "#FFFFFF" },
                 jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
             };
 
             html2pdf().set(options).from(element).save();
-            // Increment counter in localStorage
-            const currentCounter = parseInt(localStorage.getItem('invoiceCounter') || '0', 10);
+            const currentCounter = parseInt(localStorage.getItem('invoiceCounter') || '1', 10);
             localStorage.setItem('invoiceCounter', (currentCounter + 1).toString());
         } catch (error) {
             console.error("Error generating PDF:", error);
@@ -83,263 +74,201 @@ const PdfLayout = forwardRef(({ formData }, ref) => {
 
     return (
         <div style={{ display: "none" }}>
-            <div id="pdf-content" style={pdfStyles.content}>
-                <div style={pdfStyles.header}>
-                    <img src={logo} alt="Company Logo" style={pdfStyles.logo} />
-                    <h2 style={pdfStyles.title}>TAX INVOICE</h2>
-                </div>
+            <div id="pdf-content" style={s.page}>
 
-                <div style={pdfStyles.detailsRow}>
-                    <div style={pdfStyles.invoiceColumn}>
-                        <p style={pdfStyles.detailItem}><strong>Invoice No:</strong> {invoiceNumber}</p>
-                        <p style={pdfStyles.detailItem}><strong>Invoice Date:</strong> {formatField(formData?.date)}</p>
-                        <p style={pdfStyles.detailItem}><strong>Due Date:</strong> {formatField(formData?.adate)}</p>
+                {/* HEADER */}
+                <div style={s.header}>
+                    <div style={s.headerLeft}>
+                        <img src={logo} alt="Logo" style={s.logo} />
+                        <div style={s.headerName}>
+                            <span style={s.advocateName}>Kapil Gautam</span>
+                            <span style={s.advocateTitle}>Advocate</span>
+                            <span style={s.advocateQual}>LL.B(H), LL.M</span>
+                            <span style={s.advocateQual2}>(Criminal Law, Criminology &amp; Forensic Science)</span>
+                        </div>
                     </div>
-
-                    <div style={pdfStyles.billedByColumn}>
-                        <h3 style={pdfStyles.sectionTitle}>Billed By:</h3>
-                        <p style={pdfStyles.detailItem}>WebWave Business Pvt. Ltd.</p>
-                        <p style={pdfStyles.detailItem}>S-21 1st Floor Ajay Enclave</p>
-                        <p style={pdfStyles.detailItem}>Subhash Nagar, New Delhi 110027</p>
-                        <p style={pdfStyles.detailItem}><strong>GSTIN:</strong> 07AADCW8027D1ZE</p>
-                        <p style={pdfStyles.detailItem}><strong>PAN:</strong> AADCW8027D</p>
-                    </div>
-
-                    <div style={pdfStyles.billedToColumn}>
-                        <h3 style={pdfStyles.sectionTitle}>Billed To:</h3>
-                        <p style={pdfStyles.detailItem}>{formatField(formData?.name)}</p>
-                        <p style={pdfStyles.detailItem}>{formatField(formData?.company)}</p>
-                        <p style={pdfStyles.detailItem}>{formatField(formData?.address)}</p>
-                        {formData?.gst && <p style={pdfStyles.detailItem}><strong>GSTIN:</strong> {formData.gst}</p>}
-                        {formData?.pan && <p style={pdfStyles.detailItem}><strong>PAN:</strong> {formData.pan}</p>}
+                    <div style={s.headerRight}>
+                        <div style={s.originalTag}>Original for Recipient</div>
+                        <div style={s.invoiceTitle}>TAX INVOICE</div>
+                        <div style={s.invoiceNumber}>{invoiceNumber}</div>
                     </div>
                 </div>
 
-                <table style={pdfStyles.itemsTable}>
+                {/* AMOUNT DUE BANNER */}
+                <div style={s.amountBanner}>
+                    <span style={s.bannerLabel}>Amount Due:</span>
+                    <span style={s.bannerAmount}>&#8377; {grandTotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+                </div>
+
+                {/* DATE ROW */}
+                <div style={s.dateRow}>
+                    <div style={s.dateBlock}>
+                        <div style={s.dateItem}>
+                            <span style={s.dateLabel}>Issue Date:</span>
+                            <span style={s.dateValue}>{formatField(formData?.date)}</span>
+                        </div>
+                        <div style={s.dateItem}>
+                            <span style={s.dateLabel}>Due Date:</span>
+                            <span style={s.dateValue}>{formatField(formData?.adate)}</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* BILLED BY / BILLED TO */}
+                <div style={s.billingRow}>
+                    <div style={s.billedByBox}>
+                        <div style={s.billingHeading}>Billed By</div>
+                        <p style={s.billingName}>Kapil Gautam, Advocate</p>
+                        <p style={s.billingDetail}>LL.B(H), LL.M (Criminal Law, Criminology and Forensic Science)</p>
+                        <p style={s.billingDetail}>New Delhi, India</p>
+                    </div>
+                    <div style={s.billedToBox}>
+                        <div style={s.billingHeading}>Billed To</div>
+                        <p style={s.billingName}>{formatField(formData?.company)}</p>
+                        <p style={s.billingDetail}>{formatField(formData?.name)}</p>
+                        <p style={s.billingDetail}>{formatField(formData?.address)}</p>
+                    </div>
+                </div>
+
+                {/* ITEMS TABLE */}
+                <table style={s.table}>
                     <thead>
                         <tr>
-                            <th style={pdfStyles.tableHeader}>#</th>
-                            <th style={{ ...pdfStyles.tableHeader, width: '30%' }}>Description</th>
-                            <th style={pdfStyles.tableHeader}>HSN/SAC</th>
-                            <th style={pdfStyles.tableHeader}>Qty</th>
-                            <th style={pdfStyles.tableHeader}>Amount (₹)</th>
-                            <th style={pdfStyles.tableHeader}>IGST (18%)</th>
-                            <th style={pdfStyles.tableHeader}>CGST (0%)</th>
-                            <th style={pdfStyles.tableHeader}>SGST (0%)</th>
-                            <th style={pdfStyles.tableHeader}>Total (₹)</th>
-                            <th style={pdfStyles.tableHeader}>Tenure</th>
+                            <th style={{ ...s.th, width: "5%" }}>S.No</th>
+                            <th style={{ ...s.th, width: "65%", textAlign: "left" }}>Payment Purpose</th>
+                            <th style={{ ...s.th, width: "30%" }}>Amount (&#8377;)</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {items.map((item, index) => {
-                            const itemTotals = calculateItemTotals(item);
-                            return (
-                                <tr key={index}>
-                                    <td style={pdfStyles.tableCell}>{index + 1}</td>
-                                    <td style={{ ...pdfStyles.tableCell, width: '30%' }}>{formatField(item.description)}</td>
-                                    <td style={pdfStyles.tableCell}>{formatField(item.hsn)}</td>
-                                    <td style={pdfStyles.tableCell}>{item.quantity || 0}</td>
-                                    <td style={pdfStyles.tableCell}>{itemTotals.amount.toFixed(2)}</td>
-                                    <td style={pdfStyles.tableCell}>{itemTotals.igstAmount.toFixed(2)}</td>
-                                    <td style={pdfStyles.tableCell}>{itemTotals.cgstAmount.toFixed(2)}</td>
-                                    <td style={pdfStyles.tableCell}>{itemTotals.sgstAmount.toFixed(2)}</td>
-                                    <td style={pdfStyles.tableCell}>{itemTotals.total.toFixed(2)}</td>
-                                    <td style={pdfStyles.tableCell}>{item.tenure ? `${item.tenure} month(s)` : '-'}</td>
-                                </tr>
-                            );
-                        })}
+                        {items.map((item, index) => (
+                            <tr key={index} style={index % 2 === 0 ? s.trEven : s.trOdd}>
+                                <td style={{ ...s.td, textAlign: "center" }}>{index + 1}</td>
+                                <td style={{ ...s.td, color: C.lightNavy, fontWeight: "600" }}>{formatField(item.description)}</td>
+                                <td style={{ ...s.td, textAlign: "right" }}>
+                                    {(parseFloat(item.amount) || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                                </td>
+                            </tr>
+                        ))}
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colSpan="2" style={{ ...s.td, textAlign: "right", fontWeight: "bold", borderTop: `2px solid ${C.navy}` }}>Total</td>
+                            <td style={{ ...s.td, textAlign: "right", fontWeight: "bold", borderTop: `2px solid ${C.navy}` }}>
+                                {grandTotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                            </td>
+                        </tr>
+                    </tfoot>
                 </table>
 
-                <div style={pdfStyles.totalContainer}>
-                    <div style={pdfStyles.totalRow}>
-                        <div style={pdfStyles.totalLabel}>Sub Total:</div>
-                        <div style={pdfStyles.totalValue}>₹ {grandTotals.amount.toFixed(2)}</div>
-                    </div>
-                    <div style={pdfStyles.totalRow}>
-                        <div style={pdfStyles.totalLabel}>IGST (18%):</div>
-                        <div style={pdfStyles.totalValue}>₹ {grandTotals.igstAmount.toFixed(2)}</div>
-                    </div>
-                    <div style={pdfStyles.totalRow}>
-                        <div style={pdfStyles.totalLabel}>CGST (0%):</div>
-                        <div style={pdfStyles.totalValue}>₹ {grandTotals.cgstAmount.toFixed(2)}</div>
-                    </div>
-                    <div style={pdfStyles.totalRow}>
-                        <div style={pdfStyles.totalLabel}>SGST (0%):</div>
-                        <div style={pdfStyles.totalValue}>₹ {grandTotals.sgstAmount.toFixed(2)}</div>
-                    </div>
-                    <div style={{ ...pdfStyles.totalRow, ...pdfStyles.grandTotal }}>
-                        <div style={pdfStyles.totalLabel}>Grand Total:</div>
-                        <div style={pdfStyles.totalValue}>₹ {grandTotals.total.toFixed(2)}</div>
+                {/* TOTALS SUMMARY */}
+                <div style={s.totalsSection}>
+                    <div style={s.totalsRight}>
+                        <div style={s.totalLine}>
+                            <span style={s.totalLbl}>Total Value (in figures)</span>
+                            <span style={s.totalVal}>&#8377; {grandTotal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+                        </div>
+                        <div style={{ ...s.totalLine, ...s.grandTotalLine }}>
+                            <span style={s.totalLbl}>Total Value (in words)</span>
+                            <span style={{ ...s.totalVal, fontStyle: "italic", fontSize: "10px" }}>{amountInWords}</span>
+                        </div>
                     </div>
                 </div>
 
-                <div style={pdfStyles.footerNote}>
-                    <p style={pdfStyles.noteText}>
-                        Our company endeavors to provide our best services to our valuable clients.
-                        However, if any of our valuable clients feel deprived due to any wrong or
-                        misleading information, service, package, deficiency in providing any or all of
-                        our services or packages, or misbehavior or misrepresentation by any of our
-                        employees, then such person, client, company, or any other entity may report
-                        this matter to our official email (feedback@globalb2bmart.com) within 15
-                        days since it comes to their knowledge. *Verified & Contactable Buyers as
-                        per the chosen package(based on current availability on globalb2bmart.com)
-                    </p>
+                {/* BANK DETAILS */}
+                <div style={s.bankSection}>
+                    <div style={s.bankHeading}>Bank / Payment Details</div>
+                    <div style={s.bankGrid}>
+                        <div style={s.bankRow}>
+                            <span style={s.bankLabel}>Account Name:</span>
+                            <span style={s.bankValue}>KAPIL GAUTAM</span>
+                        </div>
+                        <div style={s.bankRow}>
+                            <span style={s.bankLabel}>Account Number:</span>
+                            <span style={s.bankValue}>XXXXXXXXXXXX</span>
+                        </div>
+                        <div style={s.bankRow}>
+                            <span style={s.bankLabel}>IFSC Code:</span>
+                            <span style={s.bankValue}>XXXXXXXX</span>
+                        </div>
+                        <div style={s.bankRow}>
+                            <span style={s.bankLabel}>Bank Name:</span>
+                            <span style={s.bankValue}>XXXXXXX BANK</span>
+                        </div>
+                        <div style={s.bankRow}>
+                            <span style={s.bankLabel}>Branch:</span>
+                            <span style={s.bankValue}>XXXXXXX</span>
+                        </div>
+                        <div style={s.bankRow}>
+                            <span style={s.bankLabel}>UPI ID:</span>
+                            <span style={s.bankValue}>XXXXXXX@upi</span>
+                        </div>
+                    </div>
                 </div>
-                <div style={pdfStyles.bankBox}>
-                    <h3 style={pdfStyles.bankBoxTitle}>Billed By:</h3>
-                    <p style={pdfStyles.detailItem}><strong>Account Name:</strong> WEBWAVE BUSINESS PRIVATE LIMITED</p>
-                    <p style={pdfStyles.detailItem}><strong>Account Number:</strong> 44576387700</p>
-                    <p style={pdfStyles.detailItem}><strong>IFSC:</strong> SBIN0021275</p>
-                    <p style={pdfStyles.detailItem}><strong>Branch Name:</strong> GANESH NAGAR</p>
-                    <p style={pdfStyles.detailItem}>
-                        <strong>Address:</strong> B-1/32, GROUND FLOOR GANESH NAGAR JANAKPURI NEW DELHI 110058
-                    </p>
+
+                {/* SIGNATURE */}
+                <div style={s.signatureSection}>
+                    <div style={s.signatureBox}>
+                        <div style={s.signatureLine}></div>
+                        <p style={s.signatureLabel}>Signature of Advocate</p>
+                        <p style={s.signatureName}>Kapil Gautam, Advocate</p>
+                    </div>
                 </div>
-                <div style={pdfStyles.signatureContainer}>
-                    <p style={pdfStyles.signatureLine}>Signature of authority</p>
-                </div>
+
             </div>
         </div>
     );
 });
 
-const pdfStyles = {
-    content: {
-        backgroundColor: "#FFFFFF",
-        color: "#000000",
-        padding: "20px",
-        fontFamily: "Arial, sans-serif",
-        maxWidth: "800px",
-        margin: "0 auto",
-    },
-    header: {
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: "20px",
-        paddingBottom: "20px",
-        borderBottom: "1px solid #000",
-    },
-    logo: {
-        height: "60px",
-    },
-    title: {
-        color: "#333",
-        margin: 0,
-        fontSize: "20px",
-        fontWeight: "bold",
-    },
-    detailsRow: {
-        display: "flex",
-        justifyContent: "space-between",
-        marginBottom: "20px",
-        paddingBottom: "15px",
-    },
-    invoiceColumn: {
-        flex: 1,
-        padding: "0 10px",
-    },
-    billedByColumn: {
-        flex: 1,
-        padding: "0 10px",
-    },
-    billedToColumn: {
-        flex: 1,
-        padding: "0 10px",
-    },
-    sectionTitle: {
-        fontSize: "14px",
-        fontWeight: "bold",
-        marginBottom: "8px",
-        color: "#333",
-    },
-    detailItem: {
-        margin: "5px 0",
-        fontSize: "12px",
-    },
-    itemsTable: {
-        width: "100%",
-        borderCollapse: "collapse",
-        margin: "20px 0",
-        border: "1px solid #000",
-    },
-    tableHeader: {
-        backgroundColor: "#f0f0f0",
-        padding: "8px",
-        textAlign: "center",
-        border: "1px solid #000",
-        fontSize: "12px",
-        fontWeight: "bold",
-    },
-    tableCell: {
-        padding: "8px",
-        textAlign: "center",
-        border: "1px solid #000",
-        fontSize: "12px",
-    },
-    totalContainer: {
-        marginTop: "20px",
-        marginLeft: "auto",
-        width: "300px",
-    },
-    totalRow: {
-        display: "flex",
-        justifyContent: "space-between",
-        marginBottom: "5px",
-        padding: "8px 10px",
-    },
-    grandTotal: {
-        backgroundColor: "#f0f0f0",
-        fontWeight: "bold",
-        borderTop: "1px solid #000",
-        borderBottom: "1px solid #000",
-    },
-    totalLabel: {
-        fontSize: "14px",
-    },
-    totalValue: {
-        fontSize: "14px",
-        minWidth: "100px",
-        textAlign: "right",
-    },
-    footerNote: {
-        marginTop: "30px",
-        padding: "15px",
-        borderTop: "1px solid #000",
-        fontSize: "11px",
-        lineHeight: "1.4",
-    },
-    noteText: {
-        margin: 0,
-    },
-    bankBox: {
-        marginTop: "20px",
-        border: "1px solid #000",
-        padding: "12px",
-        borderRadius: "6px",
-        backgroundColor: "#f9f9f9",
-        fontSize: "12px",
-    },
-    bankBoxTitle: {
-        fontSize: "14px",
-        fontWeight: "bold",
-        marginBottom: "8px",
-        textAlign: "Start",
-        textTransform: "uppercase",
-        color: "#333",
-    },
-    signatureContainer: {
-        display: "flex",
-        justifyContent: "flex-end",
-        marginTop: "80px",
-        paddingRight: "30px",
-    },
-    signatureLine: {
-        fontSize: "13px",
-        fontWeight: "bold",
-        margin: "0",
-    },
+const s = {
+    page: { backgroundColor: C.white, color: C.textDark, padding: "24px 28px", fontFamily: "Arial, sans-serif", maxWidth: "780px", margin: "0 auto", fontSize: "12px" },
+    header: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", borderBottom: `3px solid ${C.navy}`, paddingBottom: "12px" },
+    headerLeft: { display: "flex", alignItems: "center", gap: "12px" },
+    logo: { height: "60px", width: "auto", objectFit: "contain" },
+    headerName: { display: "flex", flexDirection: "column" },
+    advocateName: { fontSize: "16px", fontWeight: "bold", color: C.navy },
+    advocateTitle: { fontSize: "12px", color: C.gold, fontWeight: "bold", letterSpacing: "1px" },
+    advocateQual: { fontSize: "10px", color: C.textMid, marginTop: "2px" },
+    advocateQual2: { fontSize: "9px", color: C.textMid },
+    headerRight: { textAlign: "right", display: "flex", flexDirection: "column", alignItems: "flex-end" },
+    originalTag: { fontSize: "10px", color: C.textMid, marginBottom: "2px" },
+    invoiceTitle: { fontSize: "22px", fontWeight: "bold", color: C.navy, letterSpacing: "1px" },
+    invoiceNumber: { fontSize: "18px", fontWeight: "bold", color: C.gold },
+    amountBanner: { backgroundColor: C.navy, color: C.white, display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 16px" },
+    bannerLabel: { fontSize: "13px", fontWeight: "bold" },
+    bannerAmount: { fontSize: "15px", fontWeight: "bold", color: C.gold },
+    dateRow: { backgroundColor: C.lightGray, padding: "8px 16px", borderBottom: `1px solid ${C.borderGray}` },
+    dateBlock: { display: "flex", gap: "40px" },
+    dateItem: { display: "flex", gap: "8px", alignItems: "center" },
+    dateLabel: { fontWeight: "bold", color: C.navy, fontSize: "11px" },
+    dateValue: { color: C.textDark, fontSize: "11px" },
+    billingRow: { display: "flex", borderBottom: `2px solid ${C.navy}` },
+    billedByBox: { flex: 1, padding: "10px 16px", borderRight: `1px solid ${C.borderGray}` },
+    billedToBox: { flex: 1, padding: "10px 16px" },
+    billingHeading: { backgroundColor: C.navy, color: C.white, fontSize: "11px", fontWeight: "bold", padding: "3px 8px", marginBottom: "6px", display: "inline-block" },
+    billingName: { fontWeight: "bold", fontSize: "12px", color: C.navy, margin: "0 0 2px 0" },
+    billingDetail: { fontSize: "11px", color: C.textMid, margin: "1px 0" },
+    table: { width: "100%", borderCollapse: "collapse", border: `1px solid ${C.navy}` },
+    th: { backgroundColor: C.navy, color: C.white, padding: "7px 10px", textAlign: "center", fontSize: "11px", fontWeight: "bold", border: `1px solid ${C.lightNavy}` },
+    td: { padding: "7px 10px", fontSize: "11px", border: `1px solid ${C.borderGray}`, color: C.textDark },
+    trEven: { backgroundColor: C.white },
+    trOdd: { backgroundColor: C.lightGray },
+    totalsSection: { display: "flex", justifyContent: "flex-end", borderTop: `2px solid ${C.navy}` },
+    totalsRight: { width: "55%", border: `1px solid ${C.borderGray}` },
+    totalLine: { display: "flex", justifyContent: "space-between", padding: "5px 12px", borderBottom: `1px solid ${C.borderGray}`, fontSize: "11px" },
+    grandTotalLine: { backgroundColor: C.lightGray, fontWeight: "bold" },
+    totalLbl: { color: C.textMid, fontWeight: "600" },
+    totalVal: { color: C.textDark, fontWeight: "bold", textAlign: "right" },
+    signatureSection: { display: "flex", justifyContent: "flex-end", marginTop: "40px", paddingRight: "10px" },
+    signatureBox: { textAlign: "center", width: "180px" },
+    signatureLine: { borderTop: `1.5px solid ${C.navy}`, marginBottom: "4px" },
+    signatureLabel: { fontSize: "10px", color: C.textMid, margin: "0" },
+    signatureName: { fontSize: "11px", fontWeight: "bold", color: C.navy, margin: "2px 0 0 0" },
+    bankSection: { marginTop: "16px", border: `1px solid ${C.borderGray}`, borderRadius: "4px", overflow: "hidden" },
+    bankHeading: { backgroundColor: C.navy, color: C.white, fontSize: "11px", fontWeight: "bold", padding: "5px 12px", letterSpacing: "0.5px" },
+    bankGrid: { padding: "8px 12px", backgroundColor: C.lightGray },
+    bankRow: { display: "flex", gap: "8px", padding: "2px 0", borderBottom: `1px solid ${C.borderGray}`, fontSize: "11px" },
+    bankLabel: { fontWeight: "bold", color: C.navy, minWidth: "130px" },
+    bankValue: { color: C.textDark },
 };
 
 export default PdfLayout;

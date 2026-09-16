@@ -81,8 +81,9 @@ input {
 }
 
 .logo {
-    width: 50%;
-    height: auto;
+    width: auto;
+    height: 80px;
+    object-fit: contain;
 }
 
 .logo-container h2 {

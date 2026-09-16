@@ -1,6 +1,6 @@
 // import { useState, useRef } from "react";
 // import "./FormCss.css";
-// import logo from "../components/logo.png";
+// import logo from "./logo.avif";
 // import PdfLayout from "../components/PdfLayout";
 
 // const OurFormComponent = () => {
@@ -286,15 +286,7 @@ const OurFormComponent = () => {
         items: [
             {
                 description: "",
-                hsn: "",
-                gstRate: "18%",
-                quantity: 1,
-                rate: "",
-                tenure: "",
                 amount: "",
-                igst: "",
-                cgst: "",
-                sgst: "",
             }
         ]
     });
@@ -324,15 +316,7 @@ const OurFormComponent = () => {
                 ...formData.items,
                 {
                     description: "",
-                    hsn: "",
-                    gstRate: "18%",
-                    quantity: 1,
-                    rate: "",
-                    tenure: "",
                     amount: "",
-                    igst: "",
-                    cgst: "",
-                    sgst: "",
                 }
             ]
         });
@@ -376,11 +360,11 @@ const OurFormComponent = () => {
                     />
 
 
-                    <label>Company Name:</label>
+                    <label>Client Name:</label>
                     <input
                         type="text"
                         name="company"
-                        placeholder="Company Name"
+                        placeholder="Client Name"
                         value={formData.company}
                         onChange={handleChange}
                         required
@@ -396,105 +380,16 @@ const OurFormComponent = () => {
                         required
                     />
 
-                    <label>GST Number:</label>
-                    <input
-                        type="text"
-                        name="gst"
-                        placeholder="GST Number"
-                        value={formData.gstRate}
-                        onChange={handleChange}
-                        required
-                    />
-
-                    <label>PAN Number:</label>
-                    <input
-                        type="text"
-                        name="pan"
-                        placeholder="PAN Number (optional)"
-                        value={formData.pan}
-                        onChange={handleChange}
-
-                    />
-
                     <h3>Items</h3>
                     {formData.items.map((item, index) => (
                         <div key={index} className="item-row">
-                            <label>Item Description:</label>
+                            <label>Payment Purpose:</label>
                             <input
                                 type="text"
                                 name="description"
-                                placeholder="Item description"
+                                placeholder="Payment Purpose"
                                 value={item.description}
                                 onChange={(e) => handleItemChange(index, e)}
-                                required
-                            />
-
-                            <label>HSN/SAC Code:</label>
-                            <input
-                                type="text"
-                                name="hsn"
-                                placeholder="HSN/SAC Code"
-                                value={item.hsn}
-                                onChange={(e) => handleItemChange(index, e)}
-                            />
-
-                            <label>GST Rate (%):</label>
-                            <input
-                                type="text"
-                                name="gstRate"
-                                placeholder="GST Rate"
-                                value={item.gstRate}
-                                onChange={(e) => handleItemChange(index, e)}
-                                required
-                            />
-
-                            <label>IGST Rate (%):</label>
-                            <input
-                                type="text"
-                                name="igst"
-                                placeholder="IGST Rate"
-                                value={item.igst}
-                                onChange={(e) => handleItemChange(index, e)}
-                            />
-
-                            {/* ✅ Added CGST and SGST fields below IGST */}
-                            <label>CGST Rate (%):</label>
-                            <input
-                                type="text"
-                                name="cgst"
-                                placeholder="CGST Rate"
-                                value={item.cgst}
-                                onChange={(e) => handleItemChange(index, e)}
-                            />
-
-                            <label>SGST Rate (%):</label>
-                            <input
-                                type="text"
-                                name="sgst"
-                                placeholder="SGST Rate"
-                                value={item.sgst}
-                                onChange={(e) => handleItemChange(index, e)}
-                            />
-
-                            <label>Quantity:</label>
-                            <input
-                                type="number"
-                                name="quantity"
-                                placeholder="Quantity"
-                                value={item.quantity}
-                                onChange={(e) => handleItemChange(index, e)}
-                                min="1"
-                                required
-                            />
-
-                            <label>Tenure (months):</label>
-                            <input
-                                type="number"
-                                name="tenure"
-                                placeholder="Tenure in months"
-                                value={item.tenure}
-                                onChange={(e) => handleItemChange(index, e)}
-                                min="1"
                                 required
                             />
 
@@ -502,7 +397,7 @@ const OurFormComponent = () => {
                             <input
                                 type="number"
                                 name="amount"
-                                placeholder="amount"
+                                placeholder="Amount"
                                 value={item.amount}
                                 onChange={(e) => handleItemChange(index, e)}
                                 min="0"

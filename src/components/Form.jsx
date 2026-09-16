@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import "./FormCss.css";
-import logo from "../components/logo.png";
-import PdfLayout from "../components/PdfLayout";
+import logo from "./logo.png";
+import PdfLayout from "./PdfLayout";
 
 const FormComponent = () => {
     const [formData, setFormData] = useState({
@@ -34,12 +34,12 @@ const FormComponent = () => {
     return (
         <div className="main">
             <div className="form-container">
-               
+
                 <form onSubmit={handleSubmit} className="form-box">
-                <div className="logo-container">
-                    <img src={logo} alt="Company Logo" className="logo" />
-                    <h2>Fill the Details</h2>
-                </div>
+                    <div className="logo-container">
+                        <img src={logo} alt="Company Logo" className="logo" />
+                        <h2>Fill the Details</h2>
+                    </div>
                     <label>Name:</label>
                     <input
                         type="text"
