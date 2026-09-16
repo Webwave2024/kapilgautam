@@ -180,27 +180,23 @@ const PdfLayout = forwardRef(({ formData }, ref) => {
                     <div style={s.bankGrid}>
                         <div style={s.bankRow}>
                             <span style={s.bankLabel}>Account Name:</span>
-                            <span style={s.bankValue}>KAPIL GAUTAM</span>
+                            <span style={s.bankValue}>{formatField(formData?.accountName)}</span>
                         </div>
                         <div style={s.bankRow}>
                             <span style={s.bankLabel}>Account Number:</span>
-                            <span style={s.bankValue}>XXXXXXXXXXXX</span>
+                            <span style={s.bankValue}>{formatField(formData?.accountNumber)}</span>
                         </div>
                         <div style={s.bankRow}>
                             <span style={s.bankLabel}>IFSC Code:</span>
-                            <span style={s.bankValue}>XXXXXXXX</span>
+                            <span style={s.bankValue}>{formatField(formData?.ifsc)}</span>
                         </div>
                         <div style={s.bankRow}>
                             <span style={s.bankLabel}>Bank Name:</span>
-                            <span style={s.bankValue}>XXXXXXX BANK</span>
+                            <span style={s.bankValue}>{formatField(formData?.bankName)}</span>
                         </div>
                         <div style={s.bankRow}>
                             <span style={s.bankLabel}>Branch:</span>
-                            <span style={s.bankValue}>XXXXXXX</span>
-                        </div>
-                        <div style={s.bankRow}>
-                            <span style={s.bankLabel}>UPI ID:</span>
-                            <span style={s.bankValue}>XXXXXXX@upi</span>
+                            <span style={s.bankValue}>{formatField(formData?.branch)}</span>
                         </div>
                     </div>
                 </div>

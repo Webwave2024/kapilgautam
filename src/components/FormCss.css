@@ -172,3 +172,27 @@ h3 {
     text-align: start;
     font-size: 1.5em;
 }
+
+/* ── Validation Styles ── */
+.input-error {
+    border: 1.5px solid #e53935 !important;
+    background-color: #fff5f5;
+    outline: none;
+}
+
+.input-error:focus {
+    box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.2);
+}
+
+.field-error {
+    color: #e53935;
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: -6px;
+    display: block;
+}
+
+.req {
+    color: #e53935;
+    margin-left: 2px;
+}
