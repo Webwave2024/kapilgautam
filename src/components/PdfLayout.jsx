@@ -81,10 +81,10 @@ const PdfLayout = forwardRef(({ formData }, ref) => {
                     <div style={s.headerLeft}>
                         <img src={logo} alt="Logo" style={s.logo} />
                         <div style={s.headerName}>
-                            <span style={s.advocateName}>Kapil Gautam</span>
-                            <span style={s.advocateTitle}>Advocate</span>
-                            <span style={s.advocateQual}>LL.B(H), LL.M</span>
-                            <span style={s.advocateQual2}>(Criminal Law, Criminology &amp; Forensic Science)</span>
+                            <span style={s.advocateName}>{formatField(formData?.billedByName)}</span>
+                            {formData?.billedByTitle && <span style={s.advocateTitle}>{formData.billedByTitle}</span>}
+                            {formData?.billedByQual && <span style={s.advocateQual}>{formData.billedByQual}</span>}
+                            {formData?.billedBySpec && <span style={s.advocateQual2}>({formData.billedBySpec})</span>}
                         </div>
                     </div>
                     <div style={s.headerRight}>
@@ -118,14 +118,22 @@ const PdfLayout = forwardRef(({ formData }, ref) => {
                 <div style={s.billingRow}>
                     <div style={s.billedByBox}>
                         <div style={s.billingHeading}>Billed By</div>
-                        <p style={s.billingName}>Kapil Gautam, Advocate</p>
-                        <p style={s.billingDetail}>LL.B(H), LL.M (Criminal Law, Criminology and Forensic Science)</p>
-                        <p style={s.billingDetail}>New Delhi, India</p>
+                        <p style={s.billingName}>
+                            {formatField(formData?.billedByName)}
+                            {formData?.billedByTitle ? `, ${formData.billedByTitle}` : ""}
+                        </p>
+                        {formData?.billedByQual && (
+                            <p style={s.billingDetail}>
+                                {formData.billedByQual}
+                                {formData?.billedBySpec ? ` (${formData.billedBySpec})` : ""}
+                            </p>
+                        )}
+                        <p style={s.billingDetail}>{formatField(formData?.billedByAddress)}</p>
                     </div>
                     <div style={s.billedToBox}>
                         <div style={s.billingHeading}>Billed To</div>
                         <p style={s.billingName}>{formatField(formData?.company)}</p>
-                        <p style={s.billingDetail}>{formatField(formData?.name)}</p>
+                        {formData?.name && <p style={s.billingDetail}>{formData.name}</p>}
                         <p style={s.billingDetail}>{formatField(formData?.address)}</p>
                     </div>
                 </div>
