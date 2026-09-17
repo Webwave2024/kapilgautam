@@ -89,7 +89,7 @@ const PdfLayout = forwardRef(({ formData }, ref) => {
                     </div>
                     <div style={s.headerRight}>
                         <div style={s.originalTag}>Original for Recipient</div>
-                        <div style={s.invoiceTitle}>TAX INVOICE</div>
+                        <div style={s.invoiceTitle}> INVOICE</div>
                         <div style={s.invoiceNumber}>{invoiceNumber}</div>
                     </div>
                 </div>
